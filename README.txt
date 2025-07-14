@@ -1,5 +1,7 @@
 Welcome to Sparkle, a Shiny Hunting tool!
 
+Currently, this is a Java program, and requires Java Runtime Environment (JRE) to run.
+
 This program allows you to choose from Generations 2-7, along with a variety of Shiny Hunting methods, including:
 	- Random Encounters
 	- Soft Resetting
