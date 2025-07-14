@@ -1,8 +1,8 @@
-Welcome to Sparkle, a Shiny Hunting tool!
+# Welcome to Sparkle, a Shiny Hunting tool!
 
 This program currently is exclusive to Java (subject to change!) and thus requires Java Runtime Environment (JRE) to run.
 
-Install Guide:
+### Install Guide:
 	- Click on the green "Code" button and select "Download ZIP".
 	- Unzip the folder with your extractor of choice.
 	- Click on Sparkle to run the program!
@@ -35,7 +35,7 @@ Once you have selected all of these prerequisites, the main GUI opens. The infor
 
 I hope you enjoy using the program!
 
-Special Thanks:
+### Special Thanks:
 	- The r/ShinyPokemon Discord
 	- Apache Commons (Math Library)
 	- msikma (PokéSprite)
