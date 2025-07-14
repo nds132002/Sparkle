@@ -366,6 +366,19 @@ public class ShinyHunter {
 
     private void save() {
         try {
+            String currentDir = System.getProperty("user.dir");
+            File directory = new File(currentDir + "/saves/");
+            if(!directory.exists()) {
+                if(directory.mkdirs()) {
+                    System.out.println("Saves directory successfully created.");
+                }
+                else {
+                    System.out.println("Failed to create Saves directory.");
+                }
+            }
+            else {
+                System.out.println("Directory already exists.");
+            }
             FileWriter saving = new FileWriter("saves/save-" + target + ".txt", false);
             saving.write("" + encounters + System.getProperty("line.separator"));
             saving.write("" + generation + System.getProperty("line.separator"));
