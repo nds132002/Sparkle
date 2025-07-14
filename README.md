@@ -7,7 +7,7 @@ https://www.java.com/en/download/manual.jsp
 ## Install Guide:
 - Click on the green "Code" button and select "Download ZIP".
 - Unzip the folder with your extractor of choice.
-- Click on Sparkle to run the program!
+- Open the folder, and click on Sparkle.jar to run the program!
 
 ## The Program
 
