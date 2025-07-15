@@ -11,22 +11,24 @@ https://www.java.com/en/download/manual.jsp
 
 ## The Program
 
-This program allows you to choose from Generations 2-7, along with a variety of Shiny Hunting methods, including:
+This program allows you to choose from Generations 2-8, along with a variety of Shiny Hunting methods, including:
 - Random Encounters
 - Soft Resetting
 - Shiny Breeding (Generation 2)
 - Masuda Method (Generation 4 and onwards)
-- Poké Radar (Generations 4 and 6)
+- Poké Radar (Generations 4, 6 and 8)
 - Chain Fishing (Generation 6)
 - Friend Safari (Generation 6)
 - Horde Encounters (Generation 6)
 - DexNav (Generation 6)
 - SOS Battles (Generation 7)
+- Dynamax Adventures (Generation 8)
+- Brilliant Pokémon (Generation 8)
 
 Other options and features include:
 - Choosing whether or not you have the Shiny Charm.
 - Choosing whether or not you are hunting on multiple systems, as well as the amount of systems.
-- Selecting any Pokémon from Generations 1-7 as your target Pokémon.
+- Selecting any Pokémon from Generations 1-8 as your target Pokémon.
 
 Once you have selected all of these prerequisites, the main GUI opens. The information on the GUI is as follows:
 - Encounters: Displays the number of encounters you have had with your target Pokémon.

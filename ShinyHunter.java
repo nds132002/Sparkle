@@ -37,12 +37,13 @@ public class ShinyHunter {
     ArrayList<String> gen5methods = new ArrayList<String>();
     ArrayList<String> gen6methods = new ArrayList<String>();
     ArrayList<String> gen7methods = new ArrayList<String>();
+    ArrayList<String> gen8methods = new ArrayList<String>();
     ArrayList<String> filenames = new ArrayList<String>();
     ArrayList<String> savefiles = new ArrayList<String>();
     ArrayList<String> samename = new ArrayList<String>();
-    String[] gens = new String[6];
-    String[] methods = new String[10];
-    String[] pokemon = new String[827];
+    String[] gens = new String[7];
+    String[] methods = new String[12];
+    String[] pokemon = new String[958];
 
     private static double calculateOdds(int generation, String method, boolean haveCharm, int encounters) {
         if(generation == 2 || generation == 3) {
@@ -154,6 +155,41 @@ public class ShinyHunter {
                 }
             }
         }
+        if(generation == 8) {
+            if(haveCharm) {
+                if(method.equals("RE") || method.equals("SR")) {
+                    return 1365.3;
+                }
+                if(method.equals("MM")) {
+                    return 512;
+                }
+                if(method.equals("DA")) {
+                    return 100;
+                }
+                if(method.equals("PR")) {
+                    return pokeRadarCalc(encounters, generation);
+                }
+                if(method.equals("BL")) {
+                    return brilliantCalc(encounters, haveCharm);
+                }
+            } else {
+                if(method.equals("RE") || method.equals("SR")) {
+                    return 4096;
+                }
+                if(method.equals("MM")) {
+                    return 682.7;
+                }
+                if(method.equals("DA")) {
+                    return 300;
+                }
+                if(method.equals("PR")) {
+                    return pokeRadarCalc(encounters, generation);
+                }
+                if(method.equals("BL")) {
+                    return brilliantCalc(encounters, haveCharm);
+                }
+            }
+        }
         return 0;
     }
 
@@ -165,7 +201,7 @@ public class ShinyHunter {
         else {
             radarOdds = 1 / ((Math.ceil(65535 / (8200 - encounters * 200)) + 1) / 65536);
         }
-        if(generation == 6)
+        if(generation == 6 || generation == 8)
         {
             radarOdds *= 2;
         }
@@ -225,6 +261,36 @@ public class ShinyHunter {
         }
 
         return 4096 / rolls;
+    }
+
+    private static double brilliantCalc(int encounters, boolean haveCharm) {
+        int rolls = 1;
+
+        if(encounters >= 1 && encounters < 50) {
+            rolls += 1;
+        }
+        if(encounters >= 50 && encounters < 100) {
+            rolls += 2;
+        }
+        if(encounters >= 100 && encounters < 200) {
+            rolls += 3;
+        }
+        if(encounters >= 200 && encounters < 300) {
+            rolls += 4;
+        }
+        if(encounters >= 300 && encounters < 500) {
+            rolls += 5;
+        }
+        if(encounters >= 500) {
+            rolls += 6;
+        }
+
+        if(haveCharm) {
+            rolls += 2;
+        }
+
+        return 4096 / rolls;
+
     }
 
     private static double binomDist(double odds, int encounters) {
@@ -287,6 +353,13 @@ public class ShinyHunter {
                 return false;
             }
         }
+        if(generation == 8) {
+            if(gen8methods.contains(method)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
         return false;
     }
 
@@ -320,6 +393,13 @@ public class ShinyHunter {
         gen7methods.add("RE");
         gen7methods.add("MM");
         gen7methods.add("SOS");
+
+        gen8methods.add("SR");
+        gen8methods.add("RE");
+        gen8methods.add("MM");
+        gen8methods.add("DA");
+        gen8methods.add("PR");
+        gen8methods.add("BL");
     }
 
     private void populateList(String listType) {
@@ -358,6 +438,7 @@ public class ShinyHunter {
         gens[3] = "5";
         gens[4] = "6";
         gens[5] = "7";
+        gens[6] = "8";
 
         methods[0] = "RE";
         methods[1] = "SR";
@@ -369,6 +450,8 @@ public class ShinyHunter {
         methods[7] = "HO";
         methods[8] = "DN";
         methods[9] = "SOS";
+        methods[10] = "DA";
+        methods[11] = "BL";
     }
 
     private void save() {
@@ -489,14 +572,14 @@ public class ShinyHunter {
             }
             obj.generation = Integer.parseInt(selectedGeneration.toString());
             
-            Object selectedMethod = JOptionPane.showInputDialog(null, "Please enter the method you are using to Shiny Hunt as follows:\n\nRandom Encounters: RE\nSoft Resets: SR\nMasuda Method: MM\nGen 2 Shiny Breeding: BR\nPoke Radar: PR\nChain Fishing: CF\nFriend Safari: FS\nHorde Encounter: HO\nDexNav: DN\nSOS Battles: SOS", "Method", JOptionPane.QUESTION_MESSAGE, null, obj.methods, obj.methods[0]);
+            Object selectedMethod = JOptionPane.showInputDialog(null, "Please enter the method you are using to Shiny Hunt as follows:\n\nRandom Encounters: RE\nSoft Resets: SR\nMasuda Method: MM\nGen 2 Shiny Breeding: BR\nPoke Radar: PR\nChain Fishing: CF\nFriend Safari: FS\nHorde Encounter: HO\nDexNav: DN\nSOS Battles: SOS\nDynamax Adventures: DA\nBrilliant Pokémon: BL", "Method", JOptionPane.QUESTION_MESSAGE, null, obj.methods, obj.methods[0]);
             if(selectedMethod == null) {
                 System.exit(0);
             }
             obj.method = selectedMethod.toString();
 
             while(!obj.methodGenCheck(obj.generation, obj.method)) {
-                selectedMethod = JOptionPane.showInputDialog(null, "Please enter the method you are using to Shiny Hunt as follows:\n\nRandom Encounters: RE\nSoft Resets: SR\nMasuda Method: MM\nGen 2 Shiny Breeding: BR\nPoke Radar: PR\nChain Fishing: CF\nFriend Safari: FS\nHorder Encounter: HO\nDexNav: DN\nSOS Battles: SOS", "Method", JOptionPane.QUESTION_MESSAGE, null, obj.methods, obj.methods[0]);
+                selectedMethod = JOptionPane.showInputDialog(null, "Please enter the method you are using to Shiny Hunt as follows:\n\nRandom Encounters: RE\nSoft Resets: SR\nMasuda Method: MM\nGen 2 Shiny Breeding: BR\nPoke Radar: PR\nChain Fishing: CF\nFriend Safari: FS\nHorder Encounter: HO\nDexNav: DN\nSOS Battles: SOS\nDynamax Adventures: DA\nBrilliant Pokémon: BL", "Method", JOptionPane.QUESTION_MESSAGE, null, obj.methods, obj.methods[0]);
                 if(selectedMethod == null) {
                     System.exit(0);
                 }
