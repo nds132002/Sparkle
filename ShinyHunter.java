@@ -28,6 +28,8 @@ public class ShinyHunter {
     int seconds = 0;
     boolean done = false;
     int systems = 0;
+    Boolean newFile = true;
+    String loadedFileName;
     Font customFont;
     ArrayList<String> gen2methods = new ArrayList<String>();
     ArrayList<String> gen3methods = new ArrayList<String>();
@@ -37,6 +39,7 @@ public class ShinyHunter {
     ArrayList<String> gen7methods = new ArrayList<String>();
     ArrayList<String> filenames = new ArrayList<String>();
     ArrayList<String> savefiles = new ArrayList<String>();
+    ArrayList<String> samename = new ArrayList<String>();
     String[] gens = new String[6];
     String[] methods = new String[10];
     String[] pokemon = new String[827];
@@ -336,8 +339,12 @@ public class ShinyHunter {
                         filenames.add(file.getName());
                         pokemon[i] = file.getName().substring(0, file.getName().length() - 4);
                         i++;
-                    } else {
+                    } else if(listType == "savefiles") {
                         savefiles.add(file.getName().substring(0, file.getName().length() - 4));
+                    } else {
+                        if(file.getName().startsWith("save-" + target)) {
+                            samename.add(file.getName());
+                        }
                     }
                 }
             }
@@ -379,7 +386,20 @@ public class ShinyHunter {
             else {
                 System.out.println("Directory already exists.");
             }
-            FileWriter saving = new FileWriter("saves/save-" + target + ".txt", false);
+            FileWriter saving;
+            if(samename.size() >= 1) {
+                if(newFile) {
+                    saving = new FileWriter("saves/save-" + target + samename.size() + ".txt", false);
+                    newFile = false;
+                } else {
+                    saving = new FileWriter(loadedFileName, false);
+                }
+            } else {
+                saving = new FileWriter("saves/save-" + target + ".txt", false);
+                if(newFile) {
+                    newFile = false;
+                }
+            }
             saving.write("" + encounters + System.getProperty("line.separator"));
             saving.write("" + generation + System.getProperty("line.separator"));
             saving.write(method + System.getProperty("line.separator"));
@@ -388,6 +408,7 @@ public class ShinyHunter {
             saving.write("" + seconds + System.getProperty("line.separator"));
             saving.write("" + systems + System.getProperty("line.separator"));
             saving.write(String.valueOf(done) + System.getProperty("line.separator"));
+            saving.write(String.valueOf(newFile) + System.getProperty("line.separator"));
             saving.close();
         } catch (IOException e) {
             System.out.println("Error!");
@@ -397,7 +418,8 @@ public class ShinyHunter {
 
     private void load(String filename) {
         try {
-            File saveFile = new File("saves/"+filename+".txt");
+            loadedFileName = "saves/" + filename + ".txt";
+            File saveFile = new File(loadedFileName);
             Scanner loading = new Scanner(saveFile);
             encounters = Integer.parseInt(loading.nextLine());
             generation = Integer.parseInt(loading.nextLine());
@@ -407,7 +429,7 @@ public class ShinyHunter {
             seconds = Integer.parseInt(loading.nextLine());
             systems = Integer.parseInt(loading.nextLine());
             done = Boolean.valueOf(loading.nextLine());
-            System.out.println(done);
+            newFile = Boolean.valueOf(loading.nextLine());
             loading.close();
         } catch (IOException e) {
             System.out.println("Error!");
@@ -424,6 +446,15 @@ public class ShinyHunter {
             e.printStackTrace();
         } catch (FontFormatException e) {
             e.printStackTrace();
+        }
+    }
+
+    private Boolean checkNumberString(String numberString) {
+        try {
+            Integer.parseInt(numberString);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
 
@@ -446,17 +477,30 @@ public class ShinyHunter {
                 saveFileNames[i] = obj.savefiles.get(i);
             }
             Object selectedSavefile = JOptionPane.showInputDialog(null, "Please select the save file you wish to load", "Load File", JOptionPane.QUESTION_MESSAGE, null, saveFileNames, saveFileNames[0]);
+            if(selectedSavefile == null) {
+                System.exit(0);
+            }
             obj.load(selectedSavefile.toString());
-        } else if (loadOrNot == 1 || obj.savefiles.size() == 0) {
+            obj.populateList("names");
+        } else if (loadOrNot == 1 || (obj.savefiles.size() == 0 && loadOrNot == 0)) {
             Object selectedGeneration = JOptionPane.showInputDialog(null, "Please enter the generation of Pokémon games you are hunting in:", "Generation", JOptionPane.QUESTION_MESSAGE, null, obj.gens, obj.gens[0]);
+            if(selectedGeneration == null) {
+                System.exit(0);
+            }
             obj.generation = Integer.parseInt(selectedGeneration.toString());
             
             Object selectedMethod = JOptionPane.showInputDialog(null, "Please enter the method you are using to Shiny Hunt as follows:\n\nRandom Encounters: RE\nSoft Resets: SR\nMasuda Method: MM\nGen 2 Shiny Breeding: BR\nPoke Radar: PR\nChain Fishing: CF\nFriend Safari: FS\nHorde Encounter: HO\nDexNav: DN\nSOS Battles: SOS", "Method", JOptionPane.QUESTION_MESSAGE, null, obj.methods, obj.methods[0]);
+            if(selectedMethod == null) {
+                System.exit(0);
+            }
             obj.method = selectedMethod.toString();
 
             while(!obj.methodGenCheck(obj.generation, obj.method)) {
-                Object selectedMethodRetry = JOptionPane.showInputDialog(null, "Please enter the method you are using to Shiny Hunt as follows:\n\nRandom Encounters: RE\nSoft Resets: SR\nMasuda Method: MM\nGen 2 Shiny Breeding: BR\nPoke Radar: PR\nChain Fishing: CF\nFriend Safari: FS\nHorder Encounter: HO\nDexNav: DN\nSOS Battles: SOS", "Method", JOptionPane.QUESTION_MESSAGE, null, obj.methods, obj.methods[0]);
-                obj.method = selectedMethodRetry.toString();
+                selectedMethod = JOptionPane.showInputDialog(null, "Please enter the method you are using to Shiny Hunt as follows:\n\nRandom Encounters: RE\nSoft Resets: SR\nMasuda Method: MM\nGen 2 Shiny Breeding: BR\nPoke Radar: PR\nChain Fishing: CF\nFriend Safari: FS\nHorder Encounter: HO\nDexNav: DN\nSOS Battles: SOS", "Method", JOptionPane.QUESTION_MESSAGE, null, obj.methods, obj.methods[0]);
+                if(selectedMethod == null) {
+                    System.exit(0);
+                }
+                obj.method = selectedMethod.toString();
             }
 
             if(obj.generation == 2 || obj.generation == 3 || obj.generation == 4)
@@ -470,19 +514,32 @@ public class ShinyHunter {
                 }
                 else if(charmCheck == 1) {
                     obj.haveCharm = false;
+                } else if(charmCheck == -1) {
+                    System.exit(0);
                 }
             }
 
             int selectedSystems = JOptionPane.showConfirmDialog(null, "Are you hunting on multiple systems?", "Systems", 0);
             if(selectedSystems == 0) {
                 String systemCount = JOptionPane.showInputDialog("Enter the number of systems you are using:");
+                while(!obj.checkNumberString(systemCount)) {
+                    systemCount = JOptionPane.showInputDialog("Enter the number of systems you are using:");
+                }
                 obj.systems = Integer.parseInt(systemCount);
             } else if(selectedSystems == 1) {
                 obj.systems = 1;
+            } else if(selectedSystems == -1) {
+                System.exit(0);
             }
 
             Object selectedTarget = JOptionPane.showInputDialog(null, "What is your Target Pokémon?", "Pokémon", JOptionPane.QUESTION_MESSAGE, null, obj.pokemon, obj.pokemon[0]);
+            if(selectedTarget == null) {
+                System.exit(0);
+            }
             obj.target = selectedTarget.toString();
+            obj.populateList("names");
+        } else if(loadOrNot == -1) {
+            System.exit(0);
         }
 
         obj.odds = Math.round(calculateOdds(obj.generation, obj.method, obj.haveCharm, obj.encounters));
