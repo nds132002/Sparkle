@@ -46,149 +46,92 @@ public class ShinyHunter {
     String[] pokemon = new String[958];
 
     private static double calculateOdds(int generation, String method, boolean haveCharm, int encounters) {
+        int rolls = 1;
+
         if(generation == 2 || generation == 3) {
             if(method == "BR") {
-                return 64;
+                rolls += 127;
             }
-            else {
-                return 8192;
-            }
+            return 8192 / rolls;
         }
         if(generation == 4) {
-            if(method.equals("RE") || method.equals("SR")) {
-                return 8192;
-            }
             if(method.equals("MM")) {
-                return 1638.4;
+                rolls += 4;
             }
             if(method.equals("PR")) {
                 return pokeRadarCalc(encounters, generation);
             }
+            return 8192 / rolls;
         }
         if(generation == 5) {
             if(haveCharm) {
-                if(method.equals("RE") || method.equals("SR")) {
-                    return 2730.7;
-                }
-                if(method.equals("MM")) {
-                    return 1024;
-                }
+                rolls += 2;
             }
-            else { 
-                if(method.equals("RE") || method.equals("SR")) {
-                    return 8192;
-                }
-                if(method.equals("MM")) {
-                    return 1365.3;
-                }
+            if(method.equals("MM")) {
+                rolls += 5;
             }
+            return 8192 / rolls;
         }
         if(generation == 6) {
             if(haveCharm) {
-                if(method.equals("RE") || method.equals("SR")) {
-                    return 1365.3;
-                }
-                if(method.equals("MM")) {
-                    return 512;
-                }
-                if(method.equals("FS")) {
-                    return 585.1;
-                }
-                if(method.equals("HO")) {
-                    return 273.1;
-                }
-                if(method.equals("CF")) {
-                    return chainFishingCalc(encounters, haveCharm);
-                }
-                if(method.equals("DN")) {
-                    return dexNavCalc(encounters, haveCharm);
-                }
-                if(method.equals("PR")) {
-                    return pokeRadarCalc(encounters, generation);
-                }
+                rolls += 2;
             }
-            else {
-                if(method.equals("RE") || method.equals("SR")) {
-                    return 4096;
-                }
-                if(method.equals("MM")) {
-                    return 682.7;
-                }
-                if(method.equals("FS")) {
-                    return 819.2;
-                }
-                if(method.equals("HO")) {
-                    return 819.2;
-                }
-                if(method.equals("CF")) {
-                    return chainFishingCalc(encounters, haveCharm);
-                }
-                if(method.equals("DN")) {
-                    return dexNavCalc(encounters, haveCharm);
-                }
-                if(method.equals("PR")) {
-                    return pokeRadarCalc(encounters, generation);
-                }
+            if(method.equals("MM")) {
+                rolls += 5;
             }
+            if(method.equals("FS")) {
+                rolls += 4;
+            }
+            if(method.equals("HO")) {
+                if(haveCharm) {
+                    rolls += 8;
+                }
+                rolls += 4;
+            }
+            if(method.equals("CF")) {
+                return chainFishingCalc(encounters, haveCharm);
+            }
+            if(method.equals("DN")) {
+                return dexNavCalc(encounters, haveCharm);
+            }
+            if(method.equals("PR")) {
+                return pokeRadarCalc(encounters, generation);
+            }
+            return 4096 / rolls;
         }
         if(generation == 7) {
             if(haveCharm) {
-                if(method.equals("RE") || method.equals("SR")) {
-                    return 1365.3;
-                }
-                if(method.equals("MM")) {
-                    return 512;
-                }
-                if(method.equals("SOS")) {
-                    return sosCalc(encounters, haveCharm);
-                }
+                rolls += 2;
             }
-            else {
-                if(method.equals("RE") || method.equals("SR")) {
-                    return 4096;
-                }
-                if(method.equals("MM")) {
-                    return 682.7;
-                }
-                if(method.equals("SOS")) {
-                    return sosCalc(encounters, haveCharm);
-                }
+            if(method.equals("MM")) {
+                rolls += 5;
             }
+            if(method.equals("SOS")) {
+                return sosCalc(encounters, haveCharm);
+            }
+            return 4096 / rolls;
         }
         if(generation == 8) {
             if(haveCharm) {
-                if(method.equals("RE") || method.equals("SR")) {
-                    return 1365.3;
-                }
-                if(method.equals("MM")) {
-                    return 512;
-                }
-                if(method.equals("DA")) {
+                rolls += 2;
+            }
+            if(method.equals("MM")) {
+                rolls += 5;
+            }
+            if(method.equals("DA")) {
+                if(haveCharm) {
                     return 100;
-                }
-                if(method.equals("PR")) {
-                    return pokeRadarCalc(encounters, generation);
-                }
-                if(method.equals("BL")) {
-                    return brilliantCalc(encounters, haveCharm);
-                }
-            } else {
-                if(method.equals("RE") || method.equals("SR")) {
-                    return 4096;
-                }
-                if(method.equals("MM")) {
-                    return 682.7;
-                }
-                if(method.equals("DA")) {
+                } else {
                     return 300;
                 }
-                if(method.equals("PR")) {
-                    return pokeRadarCalc(encounters, generation);
-                }
-                if(method.equals("BL")) {
-                    return brilliantCalc(encounters, haveCharm);
-                }
             }
+            if(method.equals("PR")) {
+                return pokeRadarCalc(encounters, generation);
+            }
+            if(method.equals("BL")) {
+                return brilliantCalc(encounters, haveCharm);
+            }
+            return 4096 / rolls;
         }
         return 0;
     }
@@ -648,7 +591,7 @@ public class ShinyHunter {
             targetLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             JLabel encounterLabel = new JLabel("Encounters: " + obj.encounters);
-            encounterLabel.setFont(new Font(obj.customFont.getFontName(), Font.BOLD, 15));
+            encounterLabel.setFont(new Font(obj.customFont.getFontName(), Font.BOLD, 14));
             encounterLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             encounterLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
