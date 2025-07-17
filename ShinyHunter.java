@@ -22,7 +22,6 @@ public class ShinyHunter {
     String method;
     boolean haveCharm;
     String target;
-    boolean ongoing;
     double odds;
     int encounters = 0;
     int seconds = 0;
@@ -31,373 +30,13 @@ public class ShinyHunter {
     Boolean newFile = true;
     String loadedFileName;
     Font customFont;
-    ArrayList<String> gen2methods = new ArrayList<String>();
-    ArrayList<String> gen3methods = new ArrayList<String>();
-    ArrayList<String> gen4methods = new ArrayList<String>();
-    ArrayList<String> gen5methods = new ArrayList<String>();
-    ArrayList<String> gen6methods = new ArrayList<String>();
-    ArrayList<String> gen7methods = new ArrayList<String>();
-    ArrayList<String> gen8methods = new ArrayList<String>();
-    ArrayList<String> filenames = new ArrayList<String>();
-    ArrayList<String> savefiles = new ArrayList<String>();
-    ArrayList<String> samename = new ArrayList<String>();
-    String[] gens = new String[7];
-    String[] methods = new String[12];
-    String[] pokemon = new String[958];
-
-    private static double calculateOdds(int generation, String method, boolean haveCharm, int encounters) {
-        int rolls = 1;
-
-        if(generation == 2 || generation == 3) {
-            if(method == "BR") {
-                rolls += 127;
-            }
-            return 8192 / rolls;
-        }
-        if(generation == 4) {
-            if(method.equals("MM")) {
-                rolls += 4;
-            }
-            if(method.equals("PR")) {
-                return pokeRadarCalc(encounters, generation);
-            }
-            return 8192 / rolls;
-        }
-        if(generation == 5) {
-            if(haveCharm) {
-                rolls += 2;
-            }
-            if(method.equals("MM")) {
-                rolls += 5;
-            }
-            return 8192 / rolls;
-        }
-        if(generation == 6) {
-            if(haveCharm) {
-                rolls += 2;
-            }
-            if(method.equals("MM")) {
-                rolls += 5;
-            }
-            if(method.equals("FS")) {
-                rolls += 4;
-            }
-            if(method.equals("HO")) {
-                if(haveCharm) {
-                    rolls += 8;
-                }
-                rolls += 4;
-            }
-            if(method.equals("CF")) {
-                return chainFishingCalc(encounters, haveCharm);
-            }
-            if(method.equals("DN")) {
-                return dexNavCalc(encounters, haveCharm);
-            }
-            if(method.equals("PR")) {
-                return pokeRadarCalc(encounters, generation);
-            }
-            return 4096 / rolls;
-        }
-        if(generation == 7) {
-            if(haveCharm) {
-                rolls += 2;
-            }
-            if(method.equals("MM")) {
-                rolls += 5;
-            }
-            if(method.equals("SOS")) {
-                return sosCalc(encounters, haveCharm);
-            }
-            return 4096 / rolls;
-        }
-        if(generation == 8) {
-            if(haveCharm) {
-                rolls += 2;
-            }
-            if(method.equals("MM")) {
-                rolls += 5;
-            }
-            if(method.equals("DA")) {
-                if(haveCharm) {
-                    return 100;
-                } else {
-                    return 300;
-                }
-            }
-            if(method.equals("PR")) {
-                return pokeRadarCalc(encounters, generation);
-            }
-            if(method.equals("BL")) {
-                return brilliantCalc(encounters, haveCharm);
-            }
-            return 4096 / rolls;
-        }
-        return 0;
-    }
-
-    private static double pokeRadarCalc(int encounters, int generation) {
-        double radarOdds;
-        if (encounters > 40) {
-            radarOdds = 1 / (Math.ceil(65535 / (8200 - 40 * 200)) / 65536);
-        }
-        else {
-            radarOdds = 1 / ((Math.ceil(65535 / (8200 - encounters * 200)) + 1) / 65536);
-        }
-        if(generation == 6 || generation == 8)
-        {
-            radarOdds *= 2;
-        }
-        return radarOdds;
-    }
-
-    private static double chainFishingCalc(int encounters, boolean haveCharm) {
-        int rolls = 1;
-
-        if (haveCharm) {
-            rolls += 2;
-        }
-        if(encounters < 20) {
-            rolls += 2 * encounters;
-        }
-        else {
-            rolls += 40;
-        }
-
-        return 4096 / rolls;
-    }
-
-    private static double dexNavCalc(int encounters, boolean haveCharm) {
-        int rolls = 1;
-        
-        if(haveCharm)
-        {
-            rolls += 1;
-        }
-        for(int i = 1; i < encounters+1; i++) {
-            if(i > 901) {
-                continue;
-            }
-            if(i%17 == 0) {
-                rolls += 0.475;
-            }
-        }
-
-        return 4096 / rolls;
-    }
-
-    private static double sosCalc(int encounters, boolean haveCharm) {
-        int rolls = 1;
-
-        if(encounters >= 11 && encounters <= 20) {
-            rolls += 4;
-        }
-        if(encounters >= 21 && encounters <= 30) {
-            rolls += 8;
-        }
-        if(encounters >= 31) {
-            rolls += 12;
-        }
-
-        if(haveCharm) {
-            rolls += 2;
-        }
-
-        return 4096 / rolls;
-    }
-
-    private static double brilliantCalc(int encounters, boolean haveCharm) {
-        int rolls = 1;
-
-        if(encounters >= 1 && encounters < 50) {
-            rolls += 1;
-        }
-        if(encounters >= 50 && encounters < 100) {
-            rolls += 2;
-        }
-        if(encounters >= 100 && encounters < 200) {
-            rolls += 3;
-        }
-        if(encounters >= 200 && encounters < 300) {
-            rolls += 4;
-        }
-        if(encounters >= 300 && encounters < 500) {
-            rolls += 5;
-        }
-        if(encounters >= 500) {
-            rolls += 6;
-        }
-
-        if(haveCharm) {
-            rolls += 2;
-        }
-
-        return 4096 / rolls;
-
-    }
 
     private static double binomDist(double odds, int encounters) {
         BinomialDistribution binomialDist = new BinomialDistribution(encounters, 1/odds);
         return (1 - binomialDist.cumulativeProbability(0)) * 100;
     }
 
-    private boolean methodGenCheck(int generation, String method) {
-        if(generation == 2)
-        {
-            if(gen2methods.contains(method)){
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        if(generation == 3)
-        {
-            if(gen3methods.contains(method)){
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        if(generation == 4)
-        {
-            if(gen4methods.contains(method)) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        if(generation == 5)
-        {
-            if(gen5methods.contains(method)) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        if(generation == 6)
-        {
-            if(gen6methods.contains(method)) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        if(generation == 7)
-        {
-            if(gen7methods.contains(method)) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        if(generation == 8) {
-            if(gen8methods.contains(method)) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    private void populateMethodLists() {
-        gen2methods.add("SR");
-        gen2methods.add("RE");
-        gen2methods.add("BR");
-
-        gen3methods.add("SR");
-        gen3methods.add("RE");
-
-        gen4methods.add("SR");
-        gen4methods.add("RE");
-        gen4methods.add("MM");
-        gen4methods.add("PR");
-
-        gen5methods.add("SR");
-        gen5methods.add("RE");
-        gen5methods.add("MM");
-
-        gen6methods.add("SR");
-        gen6methods.add("RE");
-        gen6methods.add("MM");
-        gen6methods.add("FS");
-        gen6methods.add("HO");
-        gen6methods.add("CF");
-        gen6methods.add("DN");
-        gen6methods.add("PR");
-
-        gen7methods.add("SR");
-        gen7methods.add("RE");
-        gen7methods.add("MM");
-        gen7methods.add("SOS");
-
-        gen8methods.add("SR");
-        gen8methods.add("RE");
-        gen8methods.add("MM");
-        gen8methods.add("DA");
-        gen8methods.add("PR");
-        gen8methods.add("BL");
-    }
-
-    private void populateList(String listType) {
-        File dir;
-        int i = 0;
-        if(listType == "pokemon") {
-            dir = new File("sprites");
-        } else {
-            dir = new File("saves");
-        }
-        File[] files = dir.listFiles();
-
-        if(files != null) {
-            for(File file: files) {
-                if(file.isFile()) {
-                    if(listType == "pokemon") {
-                        filenames.add(file.getName());
-                        pokemon[i] = file.getName().substring(0, file.getName().length() - 4);
-                        i++;
-                    } else if(listType == "savefiles") {
-                        savefiles.add(file.getName().substring(0, file.getName().length() - 4));
-                    } else {
-                        if(file.getName().startsWith("save-" + target)) {
-                            samename.add(file.getName());
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private void populateOptions() {
-        gens[0] = "2";
-        gens[1] = "3";
-        gens[2] = "4";
-        gens[3] = "5";
-        gens[4] = "6";
-        gens[5] = "7";
-        gens[6] = "8";
-
-        methods[0] = "RE";
-        methods[1] = "SR";
-        methods[2] = "MM";
-        methods[3] = "BR";
-        methods[4] = "PR";
-        methods[5] = "CF";
-        methods[6] = "FS";
-        methods[7] = "HO";
-        methods[8] = "DN";
-        methods[9] = "SOS";
-        methods[10] = "DA";
-        methods[11] = "BL";
-    }
-
-    private void save() {
+    private void save(Populator populator) {
         try {
             String currentDir = System.getProperty("user.dir");
             File directory = new File(currentDir + "/saves/");
@@ -413,9 +52,9 @@ public class ShinyHunter {
                 System.out.println("Directory already exists.");
             }
             FileWriter saving;
-            if(samename.size() >= 1) {
+            if(populator.samename.size() >= 1) {
                 if(newFile) {
-                    saving = new FileWriter("saves/save-" + target + samename.size() + ".txt", false);
+                    saving = new FileWriter("saves/save-" + target + populator.samename.size() + ".txt", false);
                     newFile = false;
                 } else {
                     saving = new FileWriter(loadedFileName, false);
@@ -487,42 +126,44 @@ public class ShinyHunter {
     public static void main(String[] args) {
 
         ShinyHunter obj = new ShinyHunter();
+        Populator populator = new Populator();
 
-        obj.populateMethodLists();
-        obj.populateList("pokemon");
-        obj.populateList("savefiles");
-        obj.populateOptions();
+        populator.populateMethodLists();
+        populator.populateList("pokemon");
+        populator.populateList("savefiles");
+        populator.populateOptions();
         obj.loadFont();
 
         System.out.println("Welcome to Sparkle, a Shiny Hunting Tracker!\n");
 
         int loadOrNot = JOptionPane.showConfirmDialog(null, "Do you wish to load a file?", "Load File", 0);
-        if(loadOrNot == 0 && !(obj.savefiles.size() == 0)) {
-            String[] saveFileNames = new String[obj.savefiles.size()];
-            for(int i = 0; i < obj.savefiles.size(); i++) {
-                saveFileNames[i] = obj.savefiles.get(i);
+        if(loadOrNot == 0 && !(populator.savefiles.size() == 0)) {
+            String[] saveFileNames = new String[populator.savefiles.size()];
+            for(int i = 0; i < populator.savefiles.size(); i++) {
+                saveFileNames[i] = populator.savefiles.get(i);
             }
             Object selectedSavefile = JOptionPane.showInputDialog(null, "Please select the save file you wish to load", "Load File", JOptionPane.QUESTION_MESSAGE, null, saveFileNames, saveFileNames[0]);
             if(selectedSavefile == null) {
                 System.exit(0);
             }
             obj.load(selectedSavefile.toString());
-            obj.populateList("names");
-        } else if (loadOrNot == 1 || (obj.savefiles.size() == 0 && loadOrNot == 0)) {
-            Object selectedGeneration = JOptionPane.showInputDialog(null, "Please enter the generation of Pokémon games you are hunting in:", "Generation", JOptionPane.QUESTION_MESSAGE, null, obj.gens, obj.gens[0]);
+            populator.setTarget(obj.target);
+            populator.populateList("names");
+        } else if (loadOrNot == 1 || (populator.savefiles.size() == 0 && loadOrNot == 0)) {
+            Object selectedGeneration = JOptionPane.showInputDialog(null, "Please enter the generation of Pokémon games you are hunting in:", "Generation", JOptionPane.QUESTION_MESSAGE, null, populator.gens, populator.gens[0]);
             if(selectedGeneration == null) {
                 System.exit(0);
             }
             obj.generation = Integer.parseInt(selectedGeneration.toString());
             
-            Object selectedMethod = JOptionPane.showInputDialog(null, "Please enter the method you are using to Shiny Hunt as follows:\n\nRandom Encounters: RE\nSoft Resets: SR\nMasuda Method: MM\nGen 2 Shiny Breeding: BR\nPoke Radar: PR\nChain Fishing: CF\nFriend Safari: FS\nHorde Encounter: HO\nDexNav: DN\nSOS Battles: SOS\nDynamax Adventures: DA\nBrilliant Pokémon: BL", "Method", JOptionPane.QUESTION_MESSAGE, null, obj.methods, obj.methods[0]);
+            Object selectedMethod = JOptionPane.showInputDialog(null, "Please enter the method you are using to Shiny Hunt as follows:\n\nRandom Encounters: RE\nSoft Resets: SR\nMasuda Method: MM\nGen 2 Shiny Breeding: BR\nPoke Radar: PR\nChain Fishing: CF\nFriend Safari: FS\nHorde Encounter: HO\nDexNav: DN\nSOS Battles: SOS\nDynamax Adventures: DA\nBrilliant Pokémon: BL", "Method", JOptionPane.QUESTION_MESSAGE, null, populator.methods, populator.methods[0]);
             if(selectedMethod == null) {
                 System.exit(0);
             }
             obj.method = selectedMethod.toString();
 
-            while(!obj.methodGenCheck(obj.generation, obj.method)) {
-                selectedMethod = JOptionPane.showInputDialog(null, "Please enter the method you are using to Shiny Hunt as follows:\n\nRandom Encounters: RE\nSoft Resets: SR\nMasuda Method: MM\nGen 2 Shiny Breeding: BR\nPoke Radar: PR\nChain Fishing: CF\nFriend Safari: FS\nHorder Encounter: HO\nDexNav: DN\nSOS Battles: SOS\nDynamax Adventures: DA\nBrilliant Pokémon: BL", "Method", JOptionPane.QUESTION_MESSAGE, null, obj.methods, obj.methods[0]);
+            while(!populator.methodGenCheck(obj.generation, obj.method)) {
+                selectedMethod = JOptionPane.showInputDialog(null, "Please enter the method you are using to Shiny Hunt as follows:\n\nRandom Encounters: RE\nSoft Resets: SR\nMasuda Method: MM\nGen 2 Shiny Breeding: BR\nPoke Radar: PR\nChain Fishing: CF\nFriend Safari: FS\nHorder Encounter: HO\nDexNav: DN\nSOS Battles: SOS\nDynamax Adventures: DA\nBrilliant Pokémon: BL", "Method", JOptionPane.QUESTION_MESSAGE, null, populator.methods, populator.methods[0]);
                 if(selectedMethod == null) {
                     System.exit(0);
                 }
@@ -558,22 +199,23 @@ public class ShinyHunter {
                 System.exit(0);
             }
 
-            Object selectedTarget = JOptionPane.showInputDialog(null, "What is your Target Pokémon?", "Pokémon", JOptionPane.QUESTION_MESSAGE, null, obj.pokemon, obj.pokemon[0]);
+            Object selectedTarget = JOptionPane.showInputDialog(null, "What is your Target Pokémon?", "Pokémon", JOptionPane.QUESTION_MESSAGE, null, populator.pokemon, populator.pokemon[0]);
             if(selectedTarget == null) {
                 System.exit(0);
             }
             obj.target = selectedTarget.toString();
-            obj.populateList("names");
+            populator.setTarget(obj.target);
+            populator.populateList("names");
         } else if(loadOrNot == -1) {
             System.exit(0);
         }
 
-        obj.odds = Math.round(calculateOdds(obj.generation, obj.method, obj.haveCharm, obj.encounters));
+        obj.odds = Math.round(OddsCalculator.calculateOdds(obj.generation, obj.method, obj.haveCharm, obj.encounters));
 
         JFrame frame = new JFrame("Sparkle");
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                obj.save();
+                obj.save(populator);
                 frame.dispose();
                 System.exit(0);
             }
@@ -615,7 +257,7 @@ public class ShinyHunter {
                 {
                     obj.encounters += obj.systems;
                     encounterLabel.setText("Encounters: " + obj.encounters);
-                    obj.odds = Math.round(calculateOdds(obj.generation, obj.method, obj.haveCharm, obj.encounters));
+                    obj.odds = Math.round(OddsCalculator.calculateOdds(obj.generation, obj.method, obj.haveCharm, obj.encounters));
                     oddsLabel.setText("Odds: 1/" + obj.odds);
                     String distStr = String.format("%.02f", binomDist(obj.odds, obj.encounters));
                     binomLabel.setText("Binomial Distribution: " + distStr);
@@ -632,7 +274,7 @@ public class ShinyHunter {
                     if(obj.encounters > 0) {
                         obj.encounters -= obj.systems;
                         encounterLabel.setText("Encounters: " + obj.encounters);
-                        obj.odds = Math.round(calculateOdds(obj.generation, obj.method, obj.haveCharm, obj.encounters));
+                        obj.odds = Math.round(OddsCalculator.calculateOdds(obj.generation, obj.method, obj.haveCharm, obj.encounters));
                         oddsLabel.setText("Odds: 1/" + obj.odds);
                         String distStr = String.format("%.02f", binomDist(obj.odds, obj.encounters));
                         binomLabel.setText("Binomial Distribution: " + distStr);
