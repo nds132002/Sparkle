@@ -30,6 +30,7 @@ public class ShinyHunter {
     Boolean newFile = true;
     String loadedFileName;
     Font customFont;
+    Boolean pause = false;
 
     private static double binomDist(double odds, int encounters) {
         BinomialDistribution binomialDist = new BinomialDistribution(encounters, 1/odds);
@@ -302,6 +303,25 @@ public class ShinyHunter {
             congrats.setAlignmentX(Component.CENTER_ALIGNMENT);
             congrats.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
+            JButton pauseButton = new JButton("Pause");
+            pauseButton.setFont(new Font(obj.customFont.getFontName(), Font.PLAIN, 10));
+            pauseButton.setBackground(Color.LIGHT_GRAY);
+            pauseButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            pauseButton.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e) {
+                    obj.pause = !obj.pause;
+                    if(obj.pause) {
+                        secondsTimer.stop();
+                        timer.stop();
+                        pauseButton.setText("Unpause");
+                    } else {
+                        secondsTimer.start();
+                        timer.start();
+                        pauseButton.setText("Pause");
+                    }
+                }
+            });
+
             panel.add(targetLabel);
             panel.add(congrats);
             panel.add(encounterLabel);
@@ -310,6 +330,7 @@ public class ShinyHunter {
             panel.add(oddsLabel);
             panel.add(timerLabel);
             panel.add(binomLabel);
+            panel.add(pauseButton);
 
             JButton done = new JButton("Done!");
             done.setBackground(Color.YELLOW);
@@ -319,6 +340,7 @@ public class ShinyHunter {
                 public void actionPerformed(ActionEvent e) {
                     panel.remove(addEncounter);
                     panel.remove(subtractEncounter);
+                    panel.remove(pauseButton);
                     secondsTimer.stop();
                     timer.stop();
                     congrats.setText("Congratulations!");
@@ -333,6 +355,7 @@ public class ShinyHunter {
             if(obj.done) {
                 panel.remove(addEncounter);
                 panel.remove(subtractEncounter);
+                panel.remove(pauseButton);
                 panel.remove(done);
             }
 
@@ -342,7 +365,7 @@ public class ShinyHunter {
             e.printStackTrace();
         }
 
-        frame.setSize(300,300);
+        frame.setSize(320,320);
         frame.setResizable(false);
         frame.setVisible(true);
     }

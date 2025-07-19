@@ -37,6 +37,7 @@ Once you have selected all of these prerequisites, the main GUI opens. The infor
 - Odds: The odds of finding a Shiny Pokémon based on your chosen Generation and method.
 - Time Elapsed: The amount of time you have spent hunting your target Pokémon.
 - Binomial Distribution: Calculates the probability of finding the target Pokémon given the number of encounters and the odds.
+- Pause: Pauses the timer if it is unpaused, and unpauses the timer if it is paused.
 - Done!: Stops the timer, displays a congratulatory message, and disables the +, - and Done! buttons.
 
 I hope you enjoy using the program!
