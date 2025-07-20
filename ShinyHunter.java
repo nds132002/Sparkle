@@ -283,6 +283,40 @@ public class ShinyHunter {
                 }
             });
 
+            Set<Integer> pressedKeys = new HashSet<>();
+
+            panel.addKeyListener(new KeyListener() {
+                @Override
+                public void keyTyped(KeyEvent e) {}
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    if(pressedKeys.add(e.getKeyCode())) {
+                        if(e.getKeyCode() == KeyEvent.VK_EQUALS) {
+                            obj.encounters += obj.systems;
+                            encounterLabel.setText("Encounters: " + obj.encounters);
+                            obj.odds = Math.round(OddsCalculator.calculateOdds(obj.generation, obj.method, obj.haveCharm, obj.encounters));
+                            oddsLabel.setText("Odds: 1/" + obj.odds);
+                            String distStr = String.format("%.02f", binomDist(obj.odds, obj.encounters));
+                            binomLabel.setText("Binomial Distribution: " + distStr);
+                        } else if(e.getKeyCode() == KeyEvent.VK_MINUS) {
+                            if(obj.encounters > 0) {
+                                obj.encounters -= obj.systems;
+                                encounterLabel.setText("Encounters: " + obj.encounters);
+                                obj.odds = Math.round(OddsCalculator.calculateOdds(obj.generation, obj.method, obj.haveCharm, obj.encounters));
+                                oddsLabel.setText("Odds: 1/" + obj.odds);
+                                String distStr = String.format("%.02f", binomDist(obj.odds, obj.encounters));
+                                binomLabel.setText("Binomial Distribution: " + distStr);
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void keyReleased(KeyEvent e) {
+                    pressedKeys.remove(e.getKeyCode());
+                }
+            });
+
             JLabel timerLabel = new JLabel("Time Elapsed: " + String.format("%d:%02d:%02d", obj.seconds / 3600, (obj.seconds % 3600) / 60, (obj.seconds % 60)));
             timerLabel.setFont(new Font(obj.customFont.getFontName(), Font.PLAIN, 8));
             timerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -360,6 +394,8 @@ public class ShinyHunter {
             }
 
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            panel.setFocusable(true);
+            panel.requestFocusInWindow();
             frame.add(panel);
         } catch (IOException e) {
             e.printStackTrace();
